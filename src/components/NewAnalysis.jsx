@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { Upload, CheckCircle2, User, Phone, FileText, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { Upload, CheckCircle2, FileText, ArrowRight, Zap, RefreshCw } from 'lucide-react';
 
 export default function NewAnalysis({ onAnalysisComplete }) {
-  const [nid, setNid] = useState('1199880012345678');
-  const [phone, setPhone] = useState('+250788123456');
-  const [fullName, setFullName] = useState('Jean Paul Habimana');
-  const [tradeType, setTradeType] = useState('Retail Merchant');
-  const [fileUploaded, setFileUploaded] = useState(true);
-  const [fileName, setFileName] = useState('Official_MTN_MoMo_Statement.pdf');
+  const [nid, setNid] = useState('');
+  const [phone, setPhone] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [tradeType, setTradeType] = useState('');
+  const [fileUploaded, setFileUploaded] = useState(false);
+  const [fileName, setFileName] = useState('');
   const fileInputRef = useRef(null);
 
-  const isFormValid = nid && phone && fullName && tradeType && fileUploaded;
+  const isFormValid = nid.trim() !== '' && phone.trim() !== '' && fullName.trim() !== '' && tradeType !== '' && fileUploaded;
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
@@ -29,10 +29,19 @@ export default function NewAnalysis({ onAnalysisComplete }) {
     setFileName('Official_MTN_MoMo_Statement.pdf');
   };
 
+  const handleClearForm = () => {
+    setNid('');
+    setPhone('');
+    setFullName('');
+    setTradeType('');
+    setFileUploaded(false);
+    setFileName('');
+  };
+
   const handleStartAnalysis = (e) => {
     e.preventDefault();
     if (!isFormValid) {
-      alert("Please fill out all applicant identity fields and upload an official MoMo statement.");
+      alert("Please fill out all applicant identity fields (NID, Phone, Full Name, Trade Type) and upload an official MoMo statement.");
       return;
     }
 
@@ -48,8 +57,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
       crbStatusText: 'Verified Clean CRB Hygiene Status',
       transactions: [
         { txId: 'FT-994820', date: '2026-07-27 10:15:00', type: 'MONEY_RECEIVED', amount: 350000, senderName: 'Client Sales Payment', category: 'Sales Inflow' },
-        { txId: 'TX-994812', date: '2026-07-25 14:30:00', type: 'MERCHANT_PAYMENT', amount: 120000, merchantName: 'Bralirwa Wholesale', category: 'Inventory Purchase' },
-        { txId: 'FT-994825', date: '2026-07-24 09:20:00', type: 'MONEY_RECEIVED', amount: 480000, senderName: 'Boutique Collection', category: 'Sales Inflow' }
+        { txId: 'TX-994812', date: '2026-07-25 14:30:00', type: 'MERCHANT_PAYMENT', amount: 120000, merchantName: 'Wholesale Supplier', category: 'Inventory Purchase' }
       ]
     };
 
@@ -66,9 +74,14 @@ export default function NewAnalysis({ onAnalysisComplete }) {
           <p style={{ fontSize: '13px', color: '#94A3B8' }}>Initiate a new credit assessment profile.</p>
         </div>
 
-        <button type="button" onClick={handleFillDemoData} className="btn-outline" style={{ fontSize: '11px' }}>
-          <Zap className="w-3.5 h-3.5 text-yellow" style={{ color: '#FACC15' }} /> Fill Demo Sample Profile
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button type="button" onClick={handleClearForm} className="btn-outline" style={{ fontSize: '11px' }}>
+            <RefreshCw className="w-3.5 h-3.5" /> Clear Form
+          </button>
+          <button type="button" onClick={handleFillDemoData} className="btn-yellow" style={{ fontSize: '11px' }}>
+            <Zap className="w-3.5 h-3.5 text-yellow" /> Auto-Fill Demo Profile
+          </button>
+        </div>
       </div>
 
       {/* Main Grid Layout */}
@@ -92,7 +105,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                   required
                   value={nid}
                   onChange={(e) => setNid(e.target.value)}
-                  placeholder="Enter NID..."
+                  placeholder="Enter NID (e.g. 119988...)"
                   className="form-input"
                 />
               </div>
@@ -104,7 +117,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+250..."
+                  placeholder="+250 788..."
                   className="form-input"
                 />
               </div>
@@ -117,7 +130,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="As it appears on ID..."
+                placeholder="Enter Full Legal Name..."
                 className="form-input"
               />
             </div>
@@ -146,7 +159,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
             </div>
 
             <p style={{ fontSize: '12px', color: '#94A3B8', marginBottom: '16px' }}>
-              Upload official MTN Mobile Money statements (PDF or CSV). Max file size 10MB.
+              Upload official MTN Mobile Money statements (PDF, CSV, XLSX). Max file size 10MB.
             </p>
 
             <input
@@ -171,14 +184,14 @@ export default function NewAnalysis({ onAnalysisComplete }) {
               {fileUploaded ? (
                 <div>
                   <CheckCircle2 className="w-10 h-10" style={{ color: '#10B981', margin: '0 auto 12px' }} />
-                  <div style={{ fontWeight: 700, color: '#10B981', fontSize: '14px' }}>{fileName} Uploaded!</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>Gemini AI parser ready for structured extraction.</div>
+                  <div style={{ fontWeight: 700, color: '#10B981', fontSize: '14px' }}>{fileName || 'Statement_Uploaded.pdf'} Uploaded!</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>Click to select a different statement file.</div>
                 </div>
               ) : (
                 <div>
                   <Upload className="w-10 h-10" style={{ color: '#64748B', margin: '0 auto 12px' }} />
-                  <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '14px' }}>Drag and drop files here</div>
-                  <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>or click to browse</div>
+                  <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '14px' }}>Click to select or drag and drop statement file</div>
+                  <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Supports PDF, CSV, Excel, and JSON</div>
                   <button type="button" className="btn-outline" style={{ marginTop: '16px', padding: '8px 16px' }}>
                     Browse Files
                   </button>
@@ -198,12 +211,12 @@ export default function NewAnalysis({ onAnalysisComplete }) {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: fullName && nid ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: fullName.trim() && nid.trim() ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   1
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Applicant Identity</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{fullName && nid ? 'Validated' : 'Pending Input'}</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{fullName.trim() && nid.trim() ? 'Validated' : 'Pending Input'}</div>
                 </div>
               </div>
 
@@ -218,18 +231,19 @@ export default function NewAnalysis({ onAnalysisComplete }) {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#10B981', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: isFormValid ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   3
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Processing</div>
-                  <div style={{ fontSize: '11px', color: '#10B981' }}>Ready to analyze</div>
+                  <div style={{ fontWeight: 700, fontSize: '13px', color: isFormValid ? '#FFFFFF' : '#94A3B8' }}>Processing</div>
+                  <div style={{ fontSize: '11px', color: isFormValid ? '#10B981' : '#64748B' }}>{isFormValid ? 'Ready to analyze' : 'Pending form completion'}</div>
                 </div>
               </div>
             </div>
 
             <button
               onClick={handleStartAnalysis}
+              disabled={!isFormValid}
               className="btn-yellow"
               style={{
                 width: '100%',
@@ -237,15 +251,15 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                 padding: '14px',
                 fontSize: '14px',
                 fontWeight: 800,
-                opacity: isFormValid ? 1 : 0.8,
-                cursor: 'pointer'
+                opacity: isFormValid ? 1 : 0.4,
+                cursor: isFormValid ? 'pointer' : 'not-allowed'
               }}
             >
               Start Analysis <ArrowRight className="w-4 h-4" />
             </button>
 
             <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '10px', color: '#64748B' }}>
-              Gemini 3.6 Flash ML underwriting engine active.
+              Fill all required fields to activate underwriting.
             </div>
           </div>
         </div>
