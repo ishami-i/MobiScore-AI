@@ -1,13 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { Upload, CheckCircle2, FileText, ArrowRight, Zap, RefreshCw } from 'lucide-react';
+import { Upload, CheckCircle2, FileText, ArrowRight, Zap, RefreshCw, DollarSign } from 'lucide-react';
 
 export default function NewAnalysis({ onAnalysisComplete }) {
-  const [nid, setNid] = useState('');
-  const [phone, setPhone] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [tradeType, setTradeType] = useState('');
-  const [fileUploaded, setFileUploaded] = useState(false);
-  const [fileName, setFileName] = useState('');
+  const [nid, setNid] = useState('1199880012345678');
+  const [phone, setPhone] = useState('+250788123456');
+  const [fullName, setFullName] = useState('Jean Paul Habimana');
+  const [tradeType, setTradeType] = useState('Retail Merchant');
+  const [requestedAmount, setRequestedAmount] = useState('300,000');
+  const [requestedDuration, setRequestedDuration] = useState('60');
+  const [loanPurpose, setLoanPurpose] = useState('Working Capital / Stock Inventory');
+  const [fileUploaded, setFileUploaded] = useState(true);
+  const [fileName, setFileName] = useState('Official_MTN_MoMo_Statement.pdf');
   const fileInputRef = useRef(null);
 
   const isFormValid = nid.trim() !== '' && phone.trim() !== '' && fullName.trim() !== '' && tradeType !== '' && fileUploaded;
@@ -25,6 +28,9 @@ export default function NewAnalysis({ onAnalysisComplete }) {
     setPhone('+250788123456');
     setFullName('Jean Paul Habimana');
     setTradeType('Retail Merchant');
+    setRequestedAmount('300,000');
+    setRequestedDuration('60');
+    setLoanPurpose('Working Capital / Stock Inventory');
     setFileUploaded(true);
     setFileName('Official_MTN_MoMo_Statement.pdf');
   };
@@ -34,6 +40,9 @@ export default function NewAnalysis({ onAnalysisComplete }) {
     setPhone('');
     setFullName('');
     setTradeType('');
+    setRequestedAmount('');
+    setRequestedDuration('30');
+    setLoanPurpose('');
     setFileUploaded(false);
     setFileName('');
   };
@@ -41,7 +50,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
   const handleStartAnalysis = (e) => {
     e.preventDefault();
     if (!isFormValid) {
-      alert("Please fill out all applicant identity fields (NID, Phone, Full Name, Trade Type) and upload an official MoMo statement.");
+      alert("Please fill out all applicant identity fields and upload an official MoMo statement.");
       return;
     }
 
@@ -52,6 +61,9 @@ export default function NewAnalysis({ onAnalysisComplete }) {
       nidOrTin: nid,
       phone: phone,
       category: tradeType,
+      requestedAmount: requestedAmount || '300,000',
+      requestedDuration: requestedDuration || '60',
+      loanPurpose: loanPurpose || 'Working Capital',
       location: 'Kigali, Rwanda',
       crbStatus: 'CLEAN',
       crbStatusText: 'Verified Clean CRB Hygiene Status',
@@ -71,7 +83,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'Outfit, sans-serif' }}>New User Analysis</h1>
-          <p style={{ fontSize: '13px', color: '#94A3B8' }}>Initiate a new credit assessment profile.</p>
+          <p style={{ fontSize: '13px', color: '#94A3B8' }}>Initiate a new credit assessment & loan application profile.</p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -151,10 +163,60 @@ export default function NewAnalysis({ onAnalysisComplete }) {
             </div>
           </div>
 
-          {/* STEP 2: MOMO STATEMENT UPLOAD */}
+          {/* STEP 2: LOAN APPLICATION PARAMETERS */}
+          <div className="glass-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #1E293B', paddingBottom: '16px', marginBottom: '20px' }}>
+              <span className="brand-icon" style={{ width: '28px', height: '28px', fontSize: '14px' }}>2</span>
+              <h2 style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'Outfit, sans-serif' }}>Loan Request Details</h2>
+            </div>
+
+            <div className="grid-2" style={{ marginBottom: '16px' }}>
+              <div className="form-group">
+                <label className="form-label">Requested Loan Amount (RWF) *</label>
+                <input
+                  type="text"
+                  required
+                  value={requestedAmount}
+                  onChange={(e) => setRequestedAmount(e.target.value)}
+                  placeholder="e.g. 300,000"
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Requested Duration (Days) *</label>
+                <select
+                  value={requestedDuration}
+                  onChange={(e) => setRequestedDuration(e.target.value)}
+                  className="form-input"
+                >
+                  <option value="30">30 Days (1 Month)</option>
+                  <option value="60">60 Days (2 Months)</option>
+                  <option value="90">90 Days (3 Months)</option>
+                  <option value="180">180 Days (6 Months)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Loan Purpose</label>
+              <select
+                value={loanPurpose}
+                onChange={(e) => setLoanPurpose(e.target.value)}
+                className="form-input"
+              >
+                <option value="Working Capital / Stock Inventory">Working Capital / Stock Inventory</option>
+                <option value="Produce & Commodities Purchase">Agricultural Produce Purchase</option>
+                <option value="Equipment & Repair">Equipment Purchase / Repair</option>
+                <option value="Store Renovation">Store Expansion / Renovation</option>
+              </select>
+            </div>
+          </div>
+
+          {/* STEP 3: MOMO STATEMENT UPLOAD */}
           <div className="glass-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #1E293B', paddingBottom: '16px', marginBottom: '16px' }}>
-              <span className="brand-icon" style={{ width: '28px', height: '28px', fontSize: '14px' }}>2</span>
+              <span className="brand-icon" style={{ width: '28px', height: '28px', fontSize: '14px' }}>3</span>
               <h2 style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'Outfit, sans-serif' }}>MoMo Statement Upload</h2>
             </div>
 
@@ -175,7 +237,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
               style={{
                 border: '2px dashed #1E293B',
                 borderRadius: '16px',
-                padding: '40px',
+                padding: '36px',
                 textAlign: 'center',
                 cursor: 'pointer',
                 background: fileUploaded ? 'rgba(16, 185, 129, 0.1)' : '#060914'
@@ -221,22 +283,22 @@ export default function NewAnalysis({ onAnalysisComplete }) {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: fileUploaded ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: requestedAmount ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   2
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Data Upload</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{fileUploaded ? 'Statement Ready' : 'Awaiting statement'}</div>
+                  <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Loan Request</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{requestedAmount ? `${requestedAmount} RWF (${requestedDuration} Days)` : 'Pending Input'}</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: isFormValid ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: fileUploaded ? '#10B981' : '#1E293B', color: '#0F172A', fontWeight: 800, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   3
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '13px', color: isFormValid ? '#FFFFFF' : '#94A3B8' }}>Processing</div>
-                  <div style={{ fontSize: '11px', color: isFormValid ? '#10B981' : '#64748B' }}>{isFormValid ? 'Ready to analyze' : 'Pending form completion'}</div>
+                  <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Statement Upload</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{fileUploaded ? 'Statement Ready' : 'Awaiting statement'}</div>
                 </div>
               </div>
             </div>
@@ -255,11 +317,11 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                 cursor: isFormValid ? 'pointer' : 'not-allowed'
               }}
             >
-              Start Analysis <ArrowRight className="w-4 h-4" />
+              Start Underwriting Analysis <ArrowRight className="w-4 h-4" />
             </button>
 
             <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '10px', color: '#64748B' }}>
-              Fill all required fields to activate underwriting.
+              Evaluates cashflow against safe daily repayment caps.
             </div>
           </div>
         </div>
