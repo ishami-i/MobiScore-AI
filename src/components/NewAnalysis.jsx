@@ -27,7 +27,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
     setNid('1199880012345678');
     setPhone('+250788123456');
     setFullName('Jean Paul Habimana');
-    setTradeType('Retail Merchant');
+    setTradeType('Retail Merchant / Boutique');
     setRequestedAmount('300,000');
     setRequestedDuration('60');
     setLoanPurpose('Working Capital / Stock Inventory');
@@ -54,22 +54,24 @@ export default function NewAnalysis({ onAnalysisComplete }) {
       return;
     }
 
+    const isIndividual = tradeType.includes('Individual') || tradeType.includes('Informal');
+
     const createdApplicant = {
       id: `APP-${Date.now()}`,
-      entityType: tradeType.includes('Business') ? 'BUSINESS' : 'INDIVIDUAL',
+      entityType: isIndividual ? 'INDIVIDUAL' : 'BUSINESS',
       name: fullName,
       nidOrTin: nid,
       phone: phone,
       category: tradeType,
       requestedAmount: requestedAmount || '300,000',
       requestedDuration: requestedDuration || '60',
-      loanPurpose: loanPurpose || 'Working Capital',
+      loanPurpose: loanPurpose || (isIndividual ? 'Personal Emergency / Cashflow' : 'Working Capital'),
       location: 'Kigali, Rwanda',
       crbStatus: 'CLEAN',
       crbStatusText: 'Verified Clean CRB Hygiene Status',
       transactions: [
-        { txId: 'FT-994820', date: '2026-07-27 10:15:00', type: 'MONEY_RECEIVED', amount: 350000, senderName: 'Client Sales Payment', category: 'Sales Inflow' },
-        { txId: 'TX-994812', date: '2026-07-25 14:30:00', type: 'MERCHANT_PAYMENT', amount: 120000, merchantName: 'Wholesale Supplier', category: 'Inventory Purchase' }
+        { txId: 'FT-994820', date: '2026-07-27 10:15:00', type: 'MONEY_RECEIVED', amount: 350000, senderName: 'Salary / Client Inflow', category: 'Sales Inflow' },
+        { txId: 'TX-994812', date: '2026-07-25 14:30:00', type: 'MERCHANT_PAYMENT', amount: 120000, merchantName: 'Merchant Vendor', category: 'Expense' }
       ]
     };
 
@@ -83,7 +85,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'Outfit, sans-serif' }}>New User Analysis</h1>
-          <p style={{ fontSize: '13px', color: '#94A3B8' }}>Initiate a new credit assessment profile.</p>
+          <p style={{ fontSize: '13px', color: '#94A3B8' }}>Supports BOTH Individuals / Sole Traders & Registered MSMEs.</p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -106,18 +108,18 @@ export default function NewAnalysis({ onAnalysisComplete }) {
           <div className="glass-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #1E293B', paddingBottom: '16px', marginBottom: '20px' }}>
               <span className="brand-icon" style={{ width: '28px', height: '28px', fontSize: '14px' }}>1</span>
-              <h2 style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'Outfit, sans-serif' }}>Applicant Identity</h2>
+              <h2 style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'Outfit, sans-serif' }}>Applicant Identity (Individual or Business)</h2>
             </div>
 
             <div className="grid-2" style={{ marginBottom: '16px' }}>
               <div className="form-group">
-                <label className="form-label">National ID (NID) *</label>
+                <label className="form-label">National ID (NID) / RDB TIN *</label>
                 <input
                   type="text"
                   required
                   value={nid}
                   onChange={(e) => setNid(e.target.value)}
-                  placeholder="Enter NID (e.g. 119988...)"
+                  placeholder="Enter NID or TIN..."
                   className="form-input"
                 />
               </div>
@@ -136,29 +138,33 @@ export default function NewAnalysis({ onAnalysisComplete }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Full Legal Name *</label>
+              <label className="form-label">Full Legal Name / Business Name *</label>
               <input
                 type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter Full Legal Name..."
+                placeholder="Applicant name or business name..."
                 className="form-input"
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Trade / Business Type *</label>
+              <label className="form-label">Applicant Category / Business Type *</label>
               <select
                 value={tradeType}
                 onChange={(e) => setTradeType(e.target.value)}
                 className="form-input"
               >
-                <option value="">Select Trade Type...</option>
-                <option value="Retail Merchant">Retail Goods Merchant / Boutique</option>
-                <option value="Produce Vendor">Agricultural & Market Produce Vendor</option>
-                <option value="Transportation">Transportation (Moto-Taxi Rider)</option>
-                <option value="Wholesale Hardware">Construction & Hardware Wholesale</option>
+                <option value="">Select Category...</option>
+                <option value="Individual / Salaried Worker">👤 Individual / Salaried Worker (Personal Income)</option>
+                <option value="Informal Worker / Gig Economy">👤 Informal Worker / Gig Economy Worker</option>
+                <option value="Transportation (Moto-Taxi)">🏍️ Transportation (Moto-Taxi / Bus Driver)</option>
+                <option value="Produce & Market Vendor">🌾 Agricultural Produce & Market Vendor</option>
+                <option value="Retail Merchant / Boutique">🛍️ Retail Goods Merchant / Boutique</option>
+                <option value="Hardware & Construction">🔨 Construction & Hardware Wholesale</option>
+                <option value="Food & Restaurant Service">🍽️ Food Service (Restaurant / Cafe)</option>
+                <option value="Registered Cooperative / MSME">🏢 Registered MSME / Cooperative (RDB TIN)</option>
               </select>
             </div>
           </div>
@@ -204,11 +210,19 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                 onChange={(e) => setLoanPurpose(e.target.value)}
                 className="form-input"
               >
-                <option value="">Select Purpose...</option>
-                <option value="Working Capital / Stock Inventory">Working Capital / Stock Inventory</option>
-                <option value="Produce & Commodities Purchase">Agricultural Produce Purchase</option>
-                <option value="Equipment & Repair">Equipment Purchase / Repair</option>
-                <option value="Store Renovation">Store Expansion / Renovation</option>
+                <option value="">Select Loan Purpose...</option>
+                <optgroup label="Personal Purposes (Individual Applicants)">
+                  <option value="Personal Emergency / Cashflow">Personal Emergency / Cashflow Support</option>
+                  <option value="School Fees & Education">School Fees & Education Expenses</option>
+                  <option value="Medical & Healthcare">Medical & Healthcare Expenses</option>
+                  <option value="Home Maintenance & Rent">Home Maintenance / Rent Payment</option>
+                </optgroup>
+                <optgroup label="Business Purposes (Merchants & MSMEs)">
+                  <option value="Working Capital / Stock Inventory">Working Capital / Stock Inventory</option>
+                  <option value="Agricultural Produce Purchase">Agricultural & Farm Produce Purchase</option>
+                  <option value="Equipment Purchase & Repair">Equipment Purchase / Repair</option>
+                  <option value="Store Expansion & Renovation">Store Expansion & Renovation</option>
+                </optgroup>
               </select>
             </div>
           </div>
@@ -319,10 +333,6 @@ export default function NewAnalysis({ onAnalysisComplete }) {
             >
               Start Underwriting Analysis <ArrowRight className="w-4 h-4" />
             </button>
-
-            <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '10px', color: '#64748B' }}>
-              Fill required fields or click Auto-Fill Demo Profile.
-            </div>
           </div>
         </div>
 
