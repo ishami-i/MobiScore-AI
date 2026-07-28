@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { Upload, CheckCircle2, FileText, ArrowRight, Zap, RefreshCw, DollarSign } from 'lucide-react';
+import { Upload, CheckCircle2, FileText, ArrowRight, Zap, RefreshCw } from 'lucide-react';
 
 export default function NewAnalysis({ onAnalysisComplete }) {
-  const [nid, setNid] = useState('1199880012345678');
-  const [phone, setPhone] = useState('+250788123456');
-  const [fullName, setFullName] = useState('Jean Paul Habimana');
-  const [tradeType, setTradeType] = useState('Retail Merchant');
-  const [requestedAmount, setRequestedAmount] = useState('300,000');
-  const [requestedDuration, setRequestedDuration] = useState('60');
-  const [loanPurpose, setLoanPurpose] = useState('Working Capital / Stock Inventory');
-  const [fileUploaded, setFileUploaded] = useState(true);
-  const [fileName, setFileName] = useState('Official_MTN_MoMo_Statement.pdf');
+  const [nid, setNid] = useState('');
+  const [phone, setPhone] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [tradeType, setTradeType] = useState('');
+  const [requestedAmount, setRequestedAmount] = useState('');
+  const [requestedDuration, setRequestedDuration] = useState('30');
+  const [loanPurpose, setLoanPurpose] = useState('');
+  const [fileUploaded, setFileUploaded] = useState(false);
+  const [fileName, setFileName] = useState('');
   const fileInputRef = useRef(null);
 
   const isFormValid = nid.trim() !== '' && phone.trim() !== '' && fullName.trim() !== '' && tradeType !== '' && fileUploaded;
@@ -50,7 +50,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
   const handleStartAnalysis = (e) => {
     e.preventDefault();
     if (!isFormValid) {
-      alert("Please fill out all applicant identity fields and upload an official MoMo statement.");
+      alert("Please fill out all applicant identity fields (NID, Phone, Full Name, Trade Type) and upload an official MoMo statement.");
       return;
     }
 
@@ -83,7 +83,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, fontFamily: 'Outfit, sans-serif' }}>New User Analysis</h1>
-          <p style={{ fontSize: '13px', color: '#94A3B8' }}>Initiate a new credit assessment & loan application profile.</p>
+          <p style={{ fontSize: '13px', color: '#94A3B8' }}>Initiate a new credit assessment profile.</p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -172,10 +172,9 @@ export default function NewAnalysis({ onAnalysisComplete }) {
 
             <div className="grid-2" style={{ marginBottom: '16px' }}>
               <div className="form-group">
-                <label className="form-label">Requested Loan Amount (RWF) *</label>
+                <label className="form-label">Requested Loan Amount (RWF)</label>
                 <input
                   type="text"
-                  required
                   value={requestedAmount}
                   onChange={(e) => setRequestedAmount(e.target.value)}
                   placeholder="e.g. 300,000"
@@ -184,7 +183,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Requested Duration (Days) *</label>
+                <label className="form-label">Requested Duration (Days)</label>
                 <select
                   value={requestedDuration}
                   onChange={(e) => setRequestedDuration(e.target.value)}
@@ -205,6 +204,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                 onChange={(e) => setLoanPurpose(e.target.value)}
                 className="form-input"
               >
+                <option value="">Select Purpose...</option>
                 <option value="Working Capital / Stock Inventory">Working Capital / Stock Inventory</option>
                 <option value="Produce & Commodities Purchase">Agricultural Produce Purchase</option>
                 <option value="Equipment & Repair">Equipment Purchase / Repair</option>
@@ -288,7 +288,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Loan Request</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{requestedAmount ? `${requestedAmount} RWF (${requestedDuration} Days)` : 'Pending Input'}</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>{requestedAmount ? `${requestedAmount} RWF (${requestedDuration} Days)` : 'Optional'}</div>
                 </div>
               </div>
 
@@ -321,7 +321,7 @@ export default function NewAnalysis({ onAnalysisComplete }) {
             </button>
 
             <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '10px', color: '#64748B' }}>
-              Evaluates cashflow against safe daily repayment caps.
+              Fill required fields or click Auto-Fill Demo Profile.
             </div>
           </div>
         </div>
