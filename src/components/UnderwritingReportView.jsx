@@ -19,6 +19,8 @@ export default function UnderwritingReportView({ applicant, onBack, onUpdateAppl
   const fraudResult = detectFraud(applicant.transactions || []);
   const scoreResult = calculateCreditScore(financialAnalysis, fraudResult, applicant.crbStatus);
 
+  const isIndividual = applicant.entityType === 'INDIVIDUAL' || (applicant.category && (applicant.category.includes('Individual') || applicant.category.includes('Informal')));
+
   const handleApprove = () => {
     if (!digitalSignApproved) {
       alert("Ethics Requirement: Please check the Digital Officer Sign-off box before approving.");
@@ -82,14 +84,14 @@ export default function UnderwritingReportView({ applicant, onBack, onUpdateAppl
           {/* KPIs */}
           <div className="stats-grid-3" style={{ marginBottom: 0 }}>
             <div className="stat-card">
-              <div className="stat-label">30-Day Inflow</div>
+              <div className="stat-label">{isIndividual ? '30-Day Money Received' : '30-Day Inflow'}</div>
               <div className="stat-number" style={{ color: '#10B981', fontSize: '20px' }}>
                 {financialAnalysis.totalInflow.toLocaleString()} RWF
               </div>
             </div>
 
             <div className="stat-card">
-              <div className="stat-label">30-Day Outflow</div>
+              <div className="stat-label">{isIndividual ? '30-Day Money Sent' : '30-Day Outflow'}</div>
               <div className="stat-number" style={{ color: '#CBD5E1', fontSize: '20px' }}>
                 {financialAnalysis.totalOutflow.toLocaleString()} RWF
               </div>
@@ -104,7 +106,10 @@ export default function UnderwritingReportView({ applicant, onBack, onUpdateAppl
           </div>
 
           <div className="glass-card">
-            <CashflowHeatmap dailyData={[120, 140, 180, 210, 190, 250, 310, 130, 150, 190, 220, 200, 280, 330, 110, 160, 175, 205, 195, 260, 320, 140, 165, 185, 230, 210, 290, 340]} />
+            <CashflowHeatmap 
+              dailyData={[120, 140, 180, 210, 190, 250, 310, 130, 150, 190, 220, 200, 280, 330, 110, 160, 175, 205, 195, 260, 320, 140, 165, 185, 230, 210, 290, 340]} 
+              entityType={applicant.category || applicant.entityType}
+            />
           </div>
 
           {/* Gemini Risk Memo */}
@@ -116,7 +121,9 @@ export default function UnderwritingReportView({ applicant, onBack, onUpdateAppl
               </h3>
             </div>
             <p style={{ fontSize: '12px', color: '#CBD5E1', lineHeight: '1.6', fontFamily: 'monospace', background: '#060914', padding: '16px', borderRadius: '12px', border: '1px solid #1E293B' }}>
-              Applicant processes consistent MOMO Pay sales. Verified TransUnion CRB hygiene status. SHAP model indicates low default risk ({scoreResult.defaultProbabilityPercent}%).
+              {isIndividual
+                ? `Individual applicant receives consistent personal transfers & remittances via MoMo. Verified TransUnion CRB hygiene status. SHAP model indicates low default risk (${scoreResult.defaultProbabilityPercent}%).`
+                : `Applicant processes consistent MOMO Pay sales. Verified TransUnion CRB hygiene status. SHAP model indicates low default risk (${scoreResult.defaultProbabilityPercent}%).`}
             </p>
           </div>
 
@@ -152,7 +159,7 @@ export default function UnderwritingReportView({ applicant, onBack, onUpdateAppl
             </div>
           </div>
 
-          {/* Human Officer Decision Box: Persists State */}
+          {/* Human Officer Decision Box */}
           <div className="glass-card" style={{ borderColor: 'rgba(250, 204, 21, 0.4)' }}>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '20px' }}>
               <input

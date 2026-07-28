@@ -1,9 +1,10 @@
 import React from 'react';
 
-export default function CashflowHeatmap({ dailyData = [] }) {
+export default function CashflowHeatmap({ dailyData = [], entityType = 'BUSINESS' }) {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  
-  // Sample 28 days velocity (daily revenue in '000 RWF)
+  const isIndividual = entityType === 'INDIVIDUAL' || entityType === 'Individual / Salaried Worker' || entityType === 'Informal Worker / Gig Economy';
+
+  // Sample 28 days velocity (daily revenue or cash inflows in '000 RWF)
   const heatmapGrid = dailyData.length === 28 ? dailyData : [
     120, 140, 180, 210, 190, 250, 310,
     130, 150, 190, 220, 200, 280, 330,
@@ -16,14 +17,20 @@ export default function CashflowHeatmap({ dailyData = [] }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <div>
           <h3 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', color: '#FFFFFF' }}>
-            30-Day MoMo Daily Inflow Velocity Heatmap
+            {isIndividual 
+              ? '30-Day MoMo Personal Inflow & Transfers Received Heatmap' 
+              : '30-Day MoMo Daily Revenue Velocity Heatmap'}
           </h3>
-          <p style={{ fontSize: '11px', color: '#94A3B8' }}>Numbers show daily revenue inflows in thousands of RWF (e.g. 310k = 310,000 RWF).</p>
+          <p style={{ fontSize: '11px', color: '#94A3B8' }}>
+            {isIndividual
+              ? 'Numbers show daily personal cash inflows (transfers received, salary, remittances) in thousands of RWF.'
+              : 'Numbers show daily sales revenue inflows in thousands of RWF (e.g. 310k = 310,000 RWF).'}
+          </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', color: '#94A3B8' }}>
-          <span>Low Inflow</span>
+          <span>{isIndividual ? 'Low Inflow' : 'Low Sales'}</span>
           <div style={{ width: '60px', height: '8px', borderRadius: '4px', background: 'linear-gradient(to right, rgba(250, 204, 21, 0.2), rgba(250, 204, 21, 1))' }}></div>
-          <span>Peak Sales</span>
+          <span>{isIndividual ? 'Peak Cash Inflow' : 'Peak Sales'}</span>
         </div>
       </div>
 
@@ -55,7 +62,7 @@ export default function CashflowHeatmap({ dailyData = [] }) {
                 fontWeight: 800,
                 color: intensity > 0.5 ? '#0F172A' : '#F8FAFC'
               }}
-              title={`Day ${idx + 1}: ${val},000 RWF Inflow`}
+              title={`Day ${idx + 1}: ${val},000 RWF ${isIndividual ? 'Transfers Received' : 'Sales Inflow'}`}
             >
               {val}k RWF
             </div>
