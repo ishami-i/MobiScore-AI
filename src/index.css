@@ -1,0 +1,319 @@
+/* Complete Self-Contained Enterprise CSS for MobiScore-AI Rwanda */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-obsidian: #070913;
+  --bg-card: #0D1226;
+  --bg-card-border: #1E293B;
+  --momo-yellow: #FACC15;
+  --momo-yellow-hover: #EAB308;
+  --text-white: #F8FAFC;
+  --text-muted: #94A3B8;
+  --grade-green: #10B981;
+  --grade-cyan: #06B6D4;
+  --grade-amber: #F59E0B;
+  --grade-rose: #EF4444;
+  --font-family: 'Plus Jakarta Sans', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-obsidian);
+  color: var(--text-white);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Page Layouts */
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-obsidian);
+}
+
+.page-container {
+  flex: 1;
+  padding: 32px;
+  background-color: var(--bg-obsidian);
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Buttons */
+.btn-yellow {
+  background-color: var(--momo-yellow);
+  color: #0F172A;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(250, 204, 21, 0.2);
+}
+
+.btn-yellow:hover {
+  background-color: var(--momo-yellow-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+  border: 1px solid var(--bg-card-border);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-outline:hover {
+  border-color: var(--momo-yellow);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Cards & Grid Boxes */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin-bottom: 24px;
+}
+
+/* 3 SIDE-BY-SIDE BOXES */
+.stats-grid-3 {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px !important;
+  margin-bottom: 24px !important;
+}
+
+.stats-grid-4 {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 24px !important;
+}
+
+.grid-2 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+}
+
+.grid-12 {
+  display: grid !important;
+  grid-template-columns: 5fr 7fr !important;
+  gap: 24px !important;
+}
+
+.stat-card {
+  background: #0D1226 !important;
+  border: 1px solid #1E293B !important;
+  border-radius: 14px !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 120px !important;
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: #FFFFFF;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background-color: #0A0E1C;
+  border-right: 1px solid var(--bg-card-border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  flex-shrink: 0;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 24px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+  background-color: rgba(250, 204, 21, 0.1);
+  color: var(--momo-yellow);
+}
+
+.sidebar-item.active {
+  border-left: 3px solid var(--momo-yellow);
+}
+
+/* Tables */
+.table-container {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.table th {
+  background-color: rgba(15, 23, 42, 0.8);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--bg-card-border);
+}
+
+.table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-green {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--grade-green);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--grade-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-rose {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--grade-rose);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Forms & Modals */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-white);
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #060914;
+  border: 1px solid var(--bg-card-border);
+  border-radius: 10px;
+  color: var(--text-white);
+  font-size: 13px;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--momo-yellow);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-box {
+  background: #0D1226;
+  border: 1px solid var(--bg-card-border);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
