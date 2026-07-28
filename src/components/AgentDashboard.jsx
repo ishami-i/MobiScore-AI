@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { APPLICANT_PROFILES } from '../data/sampleDataset.js';
-import { 
-  Search, Bell, ChevronRight, Download
-} from 'lucide-react';
+import { Search, Bell, ChevronRight } from 'lucide-react';
 
-export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
+export default function AgentDashboard({ applicants = [], onSelectApplicant, onNewAnalysis }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
+
+  const filteredApplicants = applicants.filter((app) => {
+    const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          app.nidOrTin.includes(searchQuery);
+    if (filterStatus === 'HIGH_RISK') {
+      return matchesSearch && (app.crbStatus === 'ACTIVE_DEFAULT' || app.status === 'DECLINED');
+    }
+    return matchesSearch;
+  });
 
   return (
     <div className="page-container">
@@ -38,10 +44,8 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
         </div>
       </div>
 
-      {/* 3 SIDE-BY-SIDE BOX CARDS (EXACT SCREEN 3 MOCKUP MATCH) */}
+      {/* 3 SIDE-BY-SIDE BOX CARDS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
-        
-        {/* Box 1: Pending Queries */}
         <div style={{ background: '#0D1226', border: '1px solid #1E293B', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', minHeight: '130px' }}>
           <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#94A3B8', letterSpacing: '0.05em', marginBottom: '8px' }}>
             Pending Queries
@@ -53,7 +57,6 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
           <div style={{ fontSize: '11px', color: '#64748B', marginTop: '6px' }}>Applications awaiting underwriting review</div>
         </div>
 
-        {/* Box 2: Avg Processing Time */}
         <div style={{ background: '#0D1226', border: '1px solid #1E293B', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', minHeight: '130px' }}>
           <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#94A3B8', letterSpacing: '0.05em', marginBottom: '8px' }}>
             Avg Processing Time
@@ -67,7 +70,6 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
           <div style={{ fontSize: '11px', color: '#64748B', marginTop: '6px' }}>Gemini AI automated decision turnaround</div>
         </div>
 
-        {/* Box 3: Risk Flags */}
         <div style={{ background: '#0D1226', border: '1px solid #1E293B', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', minHeight: '130px' }}>
           <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#94A3B8', letterSpacing: '0.05em', marginBottom: '8px' }}>
             Risk Flags
@@ -78,7 +80,6 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
           </div>
           <div style={{ fontSize: '11px', color: '#64748B', marginTop: '6px' }}>CRB defaults or anomaly alerts</div>
         </div>
-
       </div>
 
       {/* Credit Queue Table */}
@@ -121,10 +122,10 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
             </tr>
           </thead>
           <tbody>
-            {APPLICANT_PROFILES.map((app) => (
+            {filteredApplicants.map((app) => (
               <tr key={app.id} onClick={() => onSelectApplicant(app)} style={{ cursor: 'pointer' }}>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ display: 'flex', itemsCenter: 'center', gap: '12px' }}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#1E293B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '12px', color: '#F8FAFC' }}>
                       {app.name.substring(0, 2).toUpperCase()}
                     </div>
@@ -146,8 +147,8 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
                         style={{
                           height: '100%',
                           borderRadius: '4px',
-                          backgroundColor: app.crbStatus === 'ACTIVE_DEFAULT' ? '#EF4444' : '#10B981',
-                          width: `${(app.transactions.length * 30)}%`
+                          backgroundColor: app.crbStatus === 'ACTIVE_DEFAULT' || app.status === 'DECLINED' ? '#EF4444' : '#10B981',
+                          width: `${(app.transactions ? app.transactions.length * 30 : 60)}%`
                         }}
                       ></div>
                     </div>
@@ -158,8 +159,12 @@ export default function AgentDashboard({ onSelectApplicant, onNewAnalysis }) {
                 </td>
 
                 <td>
-                  <span className={app.crbStatus === 'ACTIVE_DEFAULT' ? 'badge badge-rose' : 'badge badge-green'}>
-                    {app.crbStatus === 'ACTIVE_DEFAULT' ? 'FLAGGED' : 'PENDING REVIEW'}
+                  <span className={`badge ${
+                    app.status === 'APPROVED' ? 'badge-green' :
+                    app.status === 'DECLINED' ? 'badge-rose' :
+                    app.crbStatus === 'ACTIVE_DEFAULT' ? 'badge-rose' : 'badge-amber'
+                  }`}>
+                    {app.status || (app.crbStatus === 'ACTIVE_DEFAULT' ? 'FLAGGED' : 'PENDING REVIEW')}
                   </span>
                 </td>
 

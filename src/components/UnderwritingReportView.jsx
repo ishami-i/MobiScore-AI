@@ -11,9 +11,9 @@ import {
   ArrowLeft, ArrowUpRight, Zap, AlertTriangle, XCircle
 } from 'lucide-react';
 
-export default function UnderwritingReportView({ applicant, onBack }) {
+export default function UnderwritingReportView({ applicant, onBack, onUpdateApplicantStatus }) {
   const [digitalSignApproved, setDigitalSignApproved] = useState(false);
-  const [decisionState, setDecisionState] = useState('PENDING'); // 'PENDING', 'APPROVED', 'DECLINED'
+  const [decisionState, setDecisionState] = useState(applicant.status || 'PENDING');
 
   const financialAnalysis = analyzeTransactions(applicant.transactions || []);
   const fraudResult = detectFraud(applicant.transactions || []);
@@ -25,6 +25,9 @@ export default function UnderwritingReportView({ applicant, onBack }) {
       return;
     }
     setDecisionState('APPROVED');
+    if (onUpdateApplicantStatus) {
+      onUpdateApplicantStatus(applicant.id, 'APPROVED');
+    }
   };
 
   const handleDecline = () => {
@@ -33,6 +36,9 @@ export default function UnderwritingReportView({ applicant, onBack }) {
       return;
     }
     setDecisionState('DECLINED');
+    if (onUpdateApplicantStatus) {
+      onUpdateApplicantStatus(applicant.id, 'DECLINED');
+    }
   };
 
   return (
@@ -123,7 +129,7 @@ export default function UnderwritingReportView({ applicant, onBack }) {
 
         </div>
 
-        {/* Right Column: Sizing & Human Decision (Approve OR Decline) */}
+        {/* Right Column: Sizing & Decision Persistence */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           <div className="glass-card">
@@ -146,13 +152,13 @@ export default function UnderwritingReportView({ applicant, onBack }) {
             </div>
           </div>
 
-          {/* Human Officer Decision Box: APPROVE or DECLINE */}
+          {/* Human Officer Decision Box: Persists State */}
           <div className="glass-card" style={{ borderColor: 'rgba(250, 204, 21, 0.4)' }}>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '20px' }}>
               <input
                 type="checkbox"
                 id="digitalSignCheck"
-                checked={digitalSignApproved}
+                checked={digitalSignApproved || decisionState === 'APPROVED' || decisionState === 'DECLINED'}
                 onChange={(e) => setDigitalSignApproved(e.target.checked)}
                 style={{ marginTop: '3px' }}
               />
@@ -161,9 +167,8 @@ export default function UnderwritingReportView({ applicant, onBack }) {
               </label>
             </div>
 
-            {decisionState === 'PENDING' && (
+            {(decisionState === 'PENDING' || decisionState === 'PENDING REVIEW' || decisionState === 'FLAGGED') && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                {/* DECLINE BUTTON */}
                 <button
                   onClick={handleDecline}
                   className="btn-outline"
@@ -176,10 +181,9 @@ export default function UnderwritingReportView({ applicant, onBack }) {
                     fontWeight: 800
                   }}
                 >
-                  <XCircle className="w-4 h-4 text-rose" style={{ color: '#EF4444' }} /> DECLINE LOAN
+                  <XCircle className="w-4 h-4" style={{ color: '#EF4444' }} /> DECLINE LOAN
                 </button>
 
-                {/* APPROVE BUTTON */}
                 <button
                   onClick={handleApprove}
                   disabled={scoreResult.maxLoanLimitRwf === 0}
@@ -206,7 +210,7 @@ export default function UnderwritingReportView({ applicant, onBack }) {
                 <XCircle className="w-8 h-8" style={{ color: '#EF4444', margin: '0 auto 8px' }} />
                 <div style={{ fontWeight: 800, color: '#FCA5A5', fontSize: '15px' }}>LOAN APPLICATION DECLINED</div>
                 <div style={{ fontSize: '11px', color: '#FECDD3', marginTop: '4px' }}>
-                  Application rejected by Bank Officer for {applicant.name}. Notification sent.
+                  Application rejected by Bank Officer for {applicant.name}. Status saved in system.
                 </div>
               </div>
             )}

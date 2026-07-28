@@ -9,11 +9,13 @@ import UnderwritingReportView from './components/UnderwritingReportView.jsx';
 import RiskModelsView from './components/RiskModelsView.jsx';
 import AuditTrailView from './components/AuditTrailView.jsx';
 import ReportsView from './components/ReportsView.jsx';
+import { APPLICANT_PROFILES } from './data/sampleDataset.js';
 
 export default function App() {
-  const [userSession, setUserSession] = useState(null); // null or { role, employeeId, bankName, branch }
-  const [activeTab, setActiveTab] = useState('DASHBOARD'); // 'DASHBOARD', 'QUEUE', 'NEW_ANALYSIS', 'REPORT_VIEW'
+  const [userSession, setUserSession] = useState(null);
+  const [activeTab, setActiveTab] = useState('DASHBOARD');
   const [selectedApplicant, setSelectedApplicant] = useState(null);
+  const [applicants, setApplicants] = useState(APPLICANT_PROFILES);
 
   const handleLoginSuccess = (sessionData) => {
     setUserSession(sessionData);
@@ -31,29 +33,34 @@ export default function App() {
   };
 
   const handleAnalysisComplete = (newApplicant) => {
+    setApplicants([newApplicant, ...applicants]);
     setSelectedApplicant(newApplicant);
     setActiveTab('REPORT_VIEW');
   };
 
-  // 1. If not logged in, go STRAIGHT TO LOGIN SCREEN
+  const handleUpdateApplicantStatus = (applicantId, newStatus) => {
+    setApplicants((prev) =>
+      prev.map((app) => (app.id === applicantId ? { ...app, status: newStatus } : app))
+    );
+    if (selectedApplicant && selectedApplicant.id === applicantId) {
+      setSelectedApplicant({ ...selectedApplicant, status: newStatus });
+    }
+  };
+
   if (!userSession) {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
 
-  // 👑 TIER 1: SUPER ADMIN (PRODUCT OWNER)
   if (userSession.role === 'SUPER_ADMIN') {
     return <SuperAdminDashboard onSignOut={handleSignOut} />;
   }
 
-  // 🏛️ TIER 2: BANK INSTITUTION ADMIN
   if (userSession.role === 'BANK_ADMIN') {
     return <BankAdminDashboard bankUser={userSession} onSignOut={handleSignOut} />;
   }
 
-  // 👤 TIER 3: BANK EMPLOYEE / CREDIT OFFICER (DAILY END USER)
   return (
     <div className="main-layout">
-      {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -61,10 +68,10 @@ export default function App() {
         onSignOut={handleSignOut}
       />
 
-      {/* Main Workspace Area */}
       <div style={{ flex: 1, backgroundColor: '#070913', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         {(activeTab === 'DASHBOARD' || activeTab === 'QUEUE') && (
           <AgentDashboard
+            applicants={applicants}
             onSelectApplicant={handleSelectApplicant}
             onNewAnalysis={() => setActiveTab('NEW_ANALYSIS')}
           />
@@ -78,6 +85,7 @@ export default function App() {
           <UnderwritingReportView
             applicant={selectedApplicant}
             onBack={() => setActiveTab('DASHBOARD')}
+            onUpdateApplicantStatus={handleUpdateApplicantStatus}
           />
         )}
 
