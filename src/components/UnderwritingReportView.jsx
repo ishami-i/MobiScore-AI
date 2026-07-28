@@ -8,12 +8,12 @@ import { calculateCreditScore } from '../services/scoringEngine.js';
 import { printPdfReport, downloadCsvReport } from '../services/pdfReportGenerator.js';
 import { 
   Building2, User, FileText, Download, CheckCircle2, ShieldCheck, 
-  ArrowLeft, ArrowUpRight, Zap, AlertTriangle, AlertCircle
+  ArrowLeft, ArrowUpRight, Zap, AlertTriangle, XCircle
 } from 'lucide-react';
 
 export default function UnderwritingReportView({ applicant, onBack }) {
   const [digitalSignApproved, setDigitalSignApproved] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
+  const [decisionState, setDecisionState] = useState('PENDING'); // 'PENDING', 'APPROVED', 'DECLINED'
 
   const financialAnalysis = analyzeTransactions(applicant.transactions || []);
   const fraudResult = detectFraud(applicant.transactions || []);
@@ -24,7 +24,15 @@ export default function UnderwritingReportView({ applicant, onBack }) {
       alert("Ethics Requirement: Please check the Digital Officer Sign-off box before approving.");
       return;
     }
-    setIsApproved(true);
+    setDecisionState('APPROVED');
+  };
+
+  const handleDecline = () => {
+    if (!digitalSignApproved) {
+      alert("Ethics Requirement: Please check the Digital Officer Sign-off box before declining.");
+      return;
+    }
+    setDecisionState('DECLINED');
   };
 
   return (
@@ -115,7 +123,7 @@ export default function UnderwritingReportView({ applicant, onBack }) {
 
         </div>
 
-        {/* Right Column: Sizing & Approval */}
+        {/* Right Column: Sizing & Human Decision (Approve OR Decline) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           <div className="glass-card">
@@ -138,7 +146,7 @@ export default function UnderwritingReportView({ applicant, onBack }) {
             </div>
           </div>
 
-          {/* Human Approval Sign-Off */}
+          {/* Human Officer Decision Box: APPROVE or DECLINE */}
           <div className="glass-card" style={{ borderColor: 'rgba(250, 204, 21, 0.4)' }}>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '20px' }}>
               <input
@@ -153,22 +161,52 @@ export default function UnderwritingReportView({ applicant, onBack }) {
               </label>
             </div>
 
-            {!isApproved ? (
-              <button
-                onClick={handleApprove}
-                disabled={scoreResult.maxLoanLimitRwf === 0}
-                className="btn-yellow"
-                style={{ width: '100%', justifyContent: 'center', padding: '14px' }}
-              >
-                {scoreResult.maxLoanLimitRwf === 0 ? 'UNDERWRITING REJECTED (HIGH RISK)' : 'APPROVE LOAN & DISBURSE VIA MOMO API'}
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10B981', padding: '16px', borderRadius: '12px', textCenter: 'center', textAlign: 'center' }}>
-                <CheckCircle2 className="w-8 h-8 text-green" style={{ color: '#10B981', margin: '0 auto 8px' }} />
+            {decisionState === 'PENDING' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                {/* DECLINE BUTTON */}
+                <button
+                  onClick={handleDecline}
+                  className="btn-outline"
+                  style={{
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    borderColor: '#EF4444',
+                    color: '#FCA5A5',
+                    justifyContent: 'center',
+                    padding: '14px',
+                    fontWeight: 800
+                  }}
+                >
+                  <XCircle className="w-4 h-4 text-rose" style={{ color: '#EF4444' }} /> DECLINE LOAN
+                </button>
+
+                {/* APPROVE BUTTON */}
+                <button
+                  onClick={handleApprove}
+                  disabled={scoreResult.maxLoanLimitRwf === 0}
+                  className="btn-yellow"
+                  style={{ justifyContent: 'center', padding: '14px' }}
+                >
+                  <ArrowUpRight className="w-4 h-4" /> APPROVE & DISBURSE
+                </button>
+              </div>
+            )}
+
+            {decisionState === 'APPROVED' && (
+              <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10B981', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
+                <CheckCircle2 className="w-8 h-8" style={{ color: '#10B981', margin: '0 auto 8px' }} />
                 <div style={{ fontWeight: 800, color: '#34D399', fontSize: '15px' }}>LOAN APPROVED & DISBURSED!</div>
                 <div style={{ fontSize: '11px', color: '#A7F3D0', marginTop: '4px' }}>
                   {scoreResult.maxLoanLimitRwf.toLocaleString()} RWF transferred to {applicant.phone} via MTN MoMo API.
+                </div>
+              </div>
+            )}
+
+            {decisionState === 'DECLINED' && (
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #EF4444', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
+                <XCircle className="w-8 h-8" style={{ color: '#EF4444', margin: '0 auto 8px' }} />
+                <div style={{ fontWeight: 800, color: '#FCA5A5', fontSize: '15px' }}>LOAN APPLICATION DECLINED</div>
+                <div style={{ fontSize: '11px', color: '#FECDD3', marginTop: '4px' }}>
+                  Application rejected by Bank Officer for {applicant.name}. Notification sent.
                 </div>
               </div>
             )}
